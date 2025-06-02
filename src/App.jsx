@@ -1,27 +1,25 @@
-import React, {useState} from 'react';
-import {format} from 'date-fns';
-import "./reminder.css";
-
+import React, { useState } from 'react';
+import './App.css';
 const ReminderApp = () => {
   const [tasks, setTasks] = useState([]);
+  const [taskName, setTaskName] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [filter, setFilter] = useState('all');
-  const [form, setForm] = useState({ taskName: '', dueDate: '', description: '' });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleAddTask = (e) => {
     e.preventDefault();
-    if (!form.taskName || !form.dueDate) return;
+    if (!taskName || !dueDate) return; // Do nothing if name or date is empty
+
     const newTask = {
       id: Date.now(),
-      ...form,
+      taskName,
+      dueDate,
       completed: false,
     };
+
     setTasks((prev) => [...prev, newTask]);
-    setForm({ taskName: '', dueDate: '', description: '' });
+    setTaskName('');
+    setDueDate('');
   };
 
   const toggleCompletion = (id) => {
@@ -39,68 +37,39 @@ const ReminderApp = () => {
   });
 
   return (
-    <div className="container">
-      <h1 className="title">Reminder Application</h1>
-      <form onSubmit={handleAddTask} className="form">
+    <div>
+      <h1>Reminder App</h1>
+      <form onSubmit={handleAddTask}>
         <input
-          name="taskName"
           type="text"
+          value={taskName}
+          onChange={(e) => setTaskName(e.target.value)}
           placeholder="Task Name"
-          value={form.taskName}
-          onChange={handleChange}
-          className="input"
           required
         />
-
         <input
-          name="dueDate"
           type="date"
-          value={form.dueDate}
-          onChange={handleChange}
-          className="input"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
           required
         />
-
-        <textarea
-          name="description"
-          placeholder="Optional Description"
-          value={form.description}
-          onChange={handleChange}
-          className="textarea"
-        />
-        <button type="submit" className="btn-submit">
-          Add Task
-        </button>
+        <button type="submit">Add Task</button>
       </form>
-      <div className="filter-group">
-        <button onClick={() => setFilter('all')} className="btn-filter">
-          All Tasks
-        </button>
 
-        <button onClick={() => setFilter('completed')} className="btn-filter">
-          Completed
-        </button>
-
-        <button onClick={() => setFilter('incomplete')} className="btn-filter">
-          Incomplete
-        </button>
+      <div>
+        <button onClick={() => setFilter('all')}>All</button>
+        <button onClick={() => setFilter('completed')}>Completed</button>
+        <button onClick={() => setFilter('incomplete')}>Incomplete</button>
       </div>
-      <ul className="task-list">
+
+      <ul>
         {filteredTasks.map((task) => (
-          <li
-            key={task.id}
-            className={`task-item ${task.completed ? 'completed' : 'incomplete'}`}
-          >
-            <div className="task-row">
-              <div>
-                <h3 className="task-title">{task.taskName}</h3>
-                <p className="task-date">Due: {format(new Date(task.dueDate), 'PPP')}</p>
-                {task.description && <p className="task-desc">{task.description}</p>}
-              </div>
-              <button
-                onClick={() => toggleCompletion(task.id)}
-                className="btn-toggle"
-              >
+          <li key={task.id}>
+            <div>
+              <span>
+                {task.taskName} - {task.dueDate}
+              </span>
+              <button onClick={() => toggleCompletion(task.id)}>
                 {task.completed ? 'Mark Incomplete' : 'Mark Completed'}
               </button>
             </div>
